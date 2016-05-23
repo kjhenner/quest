@@ -11,6 +11,7 @@ end
 
 include GLI::App
 include Quest::Messenger
+include Quest::SpecRunner
 
 # Quest tools
 
