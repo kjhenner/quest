@@ -6,19 +6,7 @@ module Quest
     include Quest::SpecRunner
 
     def initialize(daemonize=true)
-      # Require serverspec here because otherwise it conflicts with
-      # the gli gem.
-      require 'serverspec'
-      require 'rspec/autorun'
-
-      # The serverspec os function creates an infinite loop.
-      # Setting it manually prevents the function from running.
-      # Note that this is a temporary workaround, and this data is wrong!
-      set :os, {}
-      set :backend, :exec
-
       @daemonize = daemonize
-
     end
 
     def restart_watcher
@@ -78,13 +66,13 @@ module Quest
 
     def start_watcher
       Quest::LOGGER.info('Starting initial spec run')
-      run_specs(spec_file, output_file)
+      run_specs(spec_file, json_output_file, status_line_output_file)
       Quest::LOGGER.info("Initializing watcher watching for changes in #{quest_watch}")
       @watcher = FileWatcher.new(quest_watch)
       @watcher_thread = Thread.new(@watcher) do |watcher|
         watcher.watch do |changed_file_path|
           Quest::LOGGER.info("Watcher triggered by a change to #{changed_file_path}")
-          run_specs(spec_file, output_file)
+          run_specs(spec_file, json_output_file, status_line_output_file)
         end
       end
     end

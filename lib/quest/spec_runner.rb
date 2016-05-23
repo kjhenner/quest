@@ -13,7 +13,8 @@ module Quest
     set :os, {}
     set :backend, :exec
 
-    def run_specs(spec_path, output_path)
+    def run_specs(spec_path, json_output_path, status_line_output_path)
+      Quest::LOGGER.info("Running #{spec_path} and saving output to #{output_path}")
       config = RSpec.configuration
 
       # Disable Standard out
@@ -33,8 +34,13 @@ module Quest
       RSpec::Core::Runner.run([spec_path])
 
       # Store test results
-      File.open(output_path, "w"){ |f| f.write(formatter.output_hash.to_json) }
-      Quest::LOGGER.info("RSpec output written to #{output_path}")
+      File.open(json_output_path, "w"){ |f| f.write(formatter.output_hash.to_json) }
+      Quest::LOGGER.info("RSpec output written to #{json_output_path}")
+
+      # Store status line output
+      status_line = status( options = {:brief => true, :color => false, :raw => false })
+      File.open(status_line_output_path, "w"){ |f| f.write(status_line) }
+      Quest::LOGGER.info("Status line written to #{status_line_output_path}")
 
       # Clean up for next spec
       RSpec.reset
