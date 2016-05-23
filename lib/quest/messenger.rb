@@ -105,21 +105,17 @@ module Quest
       JSON.parse(File.read(File.join(STATE_DIR, "#{active_quest}.json")))
     end
 
-    def completion_script_path
+    def completion_script_path(quest)
       # Get a specified script or look for a matching script in the test_tests directory
-      read_json(File.join(quest_dir, "index.json"))[active_quest]["script"] || File.join(quest_dir, "test_tests", "#{active_quest}.sh")
+      File.join(quest_dir, "test_tests", "#{quest}.sh")
     end
 
-    def run_completion_script
+    def run_completion_script(quest)
       `#{completion_script_path}`
     end
 
-    def test_all_quests
-      quests.each do |quest|
-        change_quest(quest)
-        run_completion_script
-        send_reset
-      end
+    def run_all_completion_scripts
+      quests.each{ |quest| run_completion_script(quest) }
     end
 
     def status( options = {:brief => false, :color => true, :raw => false } )

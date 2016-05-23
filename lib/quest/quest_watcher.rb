@@ -3,6 +3,7 @@ module Quest
   class QuestWatcher
 
     include Quest::Messenger
+    include Quest::SpecRunner
 
     def initialize(daemonize=true)
       # Require serverspec here because otherwise it conflicts with
@@ -18,39 +19,6 @@ module Quest
 
       @daemonize = daemonize
 
-    end
-
-    def run_specs
-      config = RSpec.configuration
-
-      # Disable Standard out
-      config.output_stream = File.open("/dev/null", "w")
-
-      # This is some messy reach-around coding to get the JsonFormatter to work
-      formatter = RSpec::Core::Formatters::JsonFormatter.new(config.output_stream)
-      reporter  = RSpec::Core::Reporter.new(config)
-      config.instance_variable_set(:@reporter, reporter)
-      loader = config.send(:formatter_loader)
-      notifications = loader.send(:notifications_for, RSpec::Core::Formatters::JsonFormatter)
-      reporter.register_listener(formatter, *notifications)
-      # End workaround
-
-      # Run the test
-      Quest::LOGGER.info("Beginning run of tests in #{spec_file}")
-      RSpec::Core::Runner.run([spec_file])
-
-      # Store test results
-      File.open(json_output_file, "w"){ |f| f.write(formatter.output_hash.to_json) }
-      Quest::LOGGER.info("RSpec output written to #{json_output_file}")
-
-      # Store status line output
-      status_line = status( options = {:brief => true, :color => false, :raw => false })
-      File.open(status_line_output_file, "w"){ |f| f.write(status_line) }
-      Quest::LOGGER.info("Status line written to #{status_line_output_file}")
-
-      # Clean up for next spec
-      RSpec.reset
-      Quest::LOGGER.info("RSpec reset")
     end
 
     def restart_watcher
@@ -110,24 +78,14 @@ module Quest
 
     def start_watcher
       Quest::LOGGER.info('Starting initial spec run')
-      run_specs
+      run_specs(spec_file, output_file)
       Quest::LOGGER.info("Initializing watcher watching for changes in #{quest_watch}")
       @watcher = FileWatcher.new(quest_watch)
       @watcher_thread = Thread.new(@watcher) do |watcher|
         watcher.watch do |changed_file_path|
           Quest::LOGGER.info("Watcher triggered by a change to #{changed_file_path}")
-          run_specs
+          run_specs(spec_file, output_file)
         end
-      end
-    end
-
-    def load_helper
-      # Require a spec_helper file if it exists
-      if File.exists?(spec_helper)
-        require spec_helper
-        Quest::LOGGER.info("Loaded spec helper at #{spec_helper}")
-      else
-        Quest::LOGGER.info("No spec_helper file found in #{quest_dir}")
       end
     end
 
@@ -139,7 +97,7 @@ module Quest
       end
       write_pid
       trap_signals
-      load_helper
+      load_helper(spec_helper)
       start_watcher
       # Keep a sleeping thread to handle signals.
       thread = Thread.new { sleep }
