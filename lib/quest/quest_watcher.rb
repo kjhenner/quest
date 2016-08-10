@@ -21,7 +21,7 @@ module Quest
     def check_active_quest
       quest = @messenger.active_quest
       raw_status = run_spec(@messenger.spec_path(quest))
-      @messenger.set_raw_status(quest, spec_output_hash)
+      @messenger.set_raw_status(quest, raw_status)
     end
 
     # This is the main function to set up and run the watcher process
