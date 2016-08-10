@@ -5,7 +5,7 @@ module Quest
   class API < Sinatra::Base
 
     get '/status' do
-      settings.messenger.quest_status[settings.mesisenger.active_quest].to_json
+      settings.messenger.quest_status[settings.messenger.active_quest].to_json
     end
 
     get '/active_quest' do

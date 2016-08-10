@@ -18,11 +18,8 @@ module Quest
         Quest::LOGGER.info("No spec_helper file found in #{@messenger.spec_helper}")
       end
 
-
       rspec_config = RSpec.configuration
-      @formatter = RSpec::Core::Formatters::JsonFormatter.new(rspec_config.output_stream)
-      # Disable Standard out
-      rspec_config.output_stream = File.open("/dev/null", "w")
+      @formatter = RSpec::Core::Formatters::JsonFormatter.new(StringIO.new)
 
       # This uses private methods, so it may not respect semver. If things
       # break with a new version, be suspicious of this code.
@@ -47,17 +44,6 @@ module Quest
       Quest::LOGGER.info("RSpec reset")
 
       return output_hash
-    end
-
-    def write_json_output(output_hash, path)
-      File.open(path, "w"){ |f| f.write(output_hash.to_json) }
-      Quest::LOGGER.info("RSpec output written to #{path}")
-    end
-
-    def write_status_line(path)
-      status_line = @messenger.status( options = {:brief => true, :color => false, :raw => false })
-      File.open(path, "w"){ |f| f.write(status_line) }
-      Quest::LOGGER.info("Status line written to #{path}")
     end
 
   end

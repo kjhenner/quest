@@ -14,8 +14,10 @@ module Quest
 
     def start_timer
       task_timer = @timers.now_and_every(5) do
-        @lock.synchronize do
+        unless @mutex.locked?
+          @mutex.lock
           check_active_quest
+          @mutex.unlock
         end
       end
       loop {@timers.wait}
