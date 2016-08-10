@@ -23,12 +23,12 @@ module GLIWrapper
     c.flag [:q, :task_dir, 'task_dir'], :desc => 'Specify the task directory.'
     c.action do |global_options, options, args|
       messenger = Quest::Messenger.new( {'task_dir' => options[:task_dir]} )
-      Quest::API.set :messenger, messenger
+      api = Thread.new do
+        Quest::API.set :messenger, messenger
+        Quest::API.run!
+      end
       watcher = Thread.new do
         Quest::QuestWatcher.new(messenger).run!
-      end
-      api = Thread.new do
-        Quest::API.run!
       end
       watcher.join
       api.join
