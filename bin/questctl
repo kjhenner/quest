@@ -27,7 +27,7 @@ module GLIWrapper
         Quest::QuestWatcher.new(messenger).run!
       end
       api = Thread.new do
-        Quest::API.run!
+        Quest::API.new(messenger).run!
       end
       Thread.join(watcher)
       Thread.join(api) 

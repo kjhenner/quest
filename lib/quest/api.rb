@@ -4,15 +4,15 @@ module Quest
   class API < Sinatra::Base
 
     get '/status' do
-      MESSENGER.raw_status
+      settings.messenger.quest_status[settings.messenger.active_quest]
     end
 
     get '/quests' do
-      MESSENGER.quests.to_json
+      settings.messenger.quests.to_json
     end
 
     post '/begin/:quest' do
-      MESSENGER.change_quest(params[:quest])
+      settings.messenger.begin_quest([:quest])
     end
   end
 

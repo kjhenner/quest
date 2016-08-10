@@ -9,6 +9,7 @@ module Quest
     attr_reader   :quest_index_file
     attr_reader   :spec_helper
     attr_accessor :active_quest
+    attr_accessor :quest_status
 
     def initialize(config = {})
       @task_dir  = config['task_dir']  || Dir.pwd
@@ -59,6 +60,12 @@ module Quest
 
     def setup_command
       JSON.parse(File.read(@quest_index_file))[active_quest]["setup_command"]
+    end
+
+    def begin_quest(quest)
+      if quests.include?(quest)
+        @active_quest = quest
+      end
     end
 
   end
