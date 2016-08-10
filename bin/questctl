@@ -25,6 +25,7 @@ module GLIWrapper
       messenger = Quest::Messenger.new( {'task_dir' => options[:task_dir]} )
       watcher = Quest::QuestWatcher.new(messenger)
       watcher.run!
+      Quest::API.run!
     end
   end
   exit run(ARGV)
