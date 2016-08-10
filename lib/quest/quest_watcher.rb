@@ -9,11 +9,14 @@ module Quest
     def initialize(messenger)
       @messenger = messenger
       @timers = Timers::Group.new
+      @lock = Mutex.new
     end
 
     def start_timer
       task_timer = @timers.now_and_every(5) do
-        check_active_quest
+        @lock.synchronize do
+          check_active_quest
+        end
       end
       loop {@timers.wait}
     end
