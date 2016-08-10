@@ -30,8 +30,8 @@ module GLIWrapper
       api = Thread.new do
         Quest::API.run!
       end
-      Thread.join(watcher)
-      Thread.join(api) 
+      watcher.join
+      api.join
     end
   end
   exit run(ARGV)
