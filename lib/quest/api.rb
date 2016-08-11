@@ -4,6 +4,10 @@ module Quest
 
   class API < Sinatra::Base
 
+    # Set defaults
+    before { content_type 'application/json' }
+    not_found { JSON.dump("error" => "Not Found") }
+
     helpers do
       def messenger
         settings.messenger
@@ -24,38 +28,39 @@ module Quest
     end
 
     get '/status/examples' do
-      active_quest_status["examples"].to_json
+      active_quest_status[:examples].to_json
     end
 
     get '/status/examples/:number' do
-      active_quest_status["examples"][params[:number].to_i - 1].to_json
+      active_quest_status[:examples][params[:number].to_i - 1].to_json
     end
 
     get '/status/examples/count' do
-      active_quest_status["examples"].size
+      active_quest_status[:examples].size
     end
 
     get '/status/examples/:number/description' do
-      active_quest_status["examples"][params[:number].to_i - 1]["description"].to_json
+      active_quest_status[:examples][params[:number].to_i - 1][:description].to_json
     end
 
     get '/status/examples/:number/file_path' do
-      active_quest_status["examples"][params[:number].to_i - 1]["file_path"].to_json
+      active_quest_status[:examples][params[:number].to_i - 1][:file_path].to_json
     end
 
     get '/status/examples/:number/status' do
-     active_quest_status["examples"][params[:number].to_i - 1]["status"].to_json
+      active_quest_status[:examples][params[:number].to_i - 1][:status].to_json
     end
 
     get '/status/examples/:number/run_time' do
-      active_quest_status["examples"][params[:number].to_i - 1]["run_time"].to_json
+      active_quest_status[:examples][params[:number].to_i - 1][:run_time].to_json
     end
 
     get '/status/summary' do
-      active_quest_status["summary"].to_json
+      active_quest_status[:summary].to_json
     end
 
     get '/active_quest' do
+      content_type 'text/html'
       active_quest
     end
 
