@@ -36,6 +36,7 @@ module Quest
     end
 
     get '/status/examples/count' do
+      content_type 'text/html'
       active_quest_status[:examples].size
     end
 
@@ -57,6 +58,11 @@ module Quest
 
     get '/status/summary' do
       active_quest_status[:summary].to_json
+    end
+
+    get '/status/summary/failure_count' do
+      content_type 'text/html'
+      active_quest_status[:summary][:failure_count]
     end
 
     get '/active_quest' do
