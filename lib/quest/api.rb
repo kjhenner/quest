@@ -56,6 +56,16 @@ module Quest
       active_quest_status[:examples][params[:number].to_i - 1][:run_time].to_json
     end
 
+    get '/parsed_status' do
+      output = {
+        "active_quest" => active_quest
+      }
+      active_quest_status[:examples].each_with_index do |example, index|
+        task_number = "Task #{(index + 1).to_s}"
+        output[task_number] = example
+      end
+      output.to_json
+
     get '/status/summary' do
       active_quest_status[:summary].to_json
     end
