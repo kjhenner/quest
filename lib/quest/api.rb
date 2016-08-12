@@ -36,8 +36,7 @@ module Quest
     end
 
     get '/status/examples/count' do
-      content_type 'text/html'
-      active_quest_status[:examples].size
+      active_quest_status[:examples].size.to_json
     end
 
     get '/status/examples/:number/description' do
@@ -65,19 +64,18 @@ module Quest
         output[task_number] = example
       end
       output.to_json
+    end
 
     get '/status/summary' do
       active_quest_status[:summary].to_json
     end
 
     get '/status/summary/failure_count' do
-      content_type 'text/html'
-      active_quest_status[:summary][:failure_count]
+      active_quest_status[:summary][:failure_count].to_json
     end
 
     get '/active_quest' do
-      content_type 'text/html'
-      active_quest
+      active_quest.to_json
     end
 
     get '/quests' do
